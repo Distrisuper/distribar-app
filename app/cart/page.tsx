@@ -4,16 +4,18 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "../store/cartStore";
 import CartItemCard from "../components/CartItemCard";
 import * as Sentry from "@sentry/nextjs";
+import { useUserStore } from "../store/userStore";
 
 export default function CartPage() {
   const router = useRouter();
   const items = useCartStore((state) => state.items);
   const getTotalPrice = useCartStore((state) => state.getTotalPrice);
+  const { orderContext } = useUserStore();
 
   const totalPrice = getTotalPrice();
 
   const handleSendOrder = () => {
-    alert("Pedido enviado");
+    alert(`Pedido enviado para ${orderContext?.type} ${orderContext?.id}`);
   };
 
   return (
