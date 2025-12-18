@@ -2,14 +2,23 @@
 
 import { useCategoryStore } from "../store/categoryStore";
 
-const categories = ["Todos", "Tragos", "Cervezas", "Comida"];
+const categories = [
+  "Todos",
+  "Tragos",
+  "Cervezas",
+  "Comida",
+  "Vinos",
+  "Sin alcohol",
+  "Promociones",
+  "Postres",
+];
 
 export default function CategoryFilter() {
   const selectedCategory = useCategoryStore((state) => state.selectedCategory);
   const setSelectedCategory = useCategoryStore((state) => state.setSelectedCategory);
 
   return (
-    <div className="w-full bg-gray-100 py-3">
+    <div className="w-full bg-gray-100 py-3 h-[8vh]">
       <div className="max-w-[600px] mx-auto px-4">
         <div className="flex gap-2 overflow-x-auto hide-scrollbar">
           {categories.map((category) => {

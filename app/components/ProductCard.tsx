@@ -1,6 +1,9 @@
 import Image from "next/image";
+import { useCartStore } from "../store/cartStore";
+import { Product } from "@/types/products/product";
 
 interface ProductCardProps {
+  product: Product;
   id: number;
   name: string;
   description: string;
@@ -9,15 +12,18 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({
+  product,
+  id,
   name,
   description,
   price,
   image,
-}: ProductCardProps) {
+    }: ProductCardProps) {
+  const addProductToCart = useCartStore((state) => state.addProduct);
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden relative">
       <div className="flex">
-        {/* Left side - Text information */}
         <div className="flex-1 p-4 flex flex-col justify-between min-h-[120px]">
           <div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">{name}</h3>
@@ -30,7 +36,6 @@ export default function ProductCard({
           </p>
         </div>
 
-        {/* Right side - Image with add button */}
         <div className="relative w-28 h-28 flex-shrink-0">
           <Image
             src={image}
@@ -41,11 +46,11 @@ export default function ProductCard({
           />
         </div>
       </div>
-      
-      {/* Add button - positioned at bottom right corner overlapping image and card */}
+
       <button
-        className="absolute bottom-2 right-2 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-105 transition-transform z-10"
+        className="absolute cursor-pointer bottom-2 right-2 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-105 transition-transform z-10"
         aria-label={`Agregar ${name} al carrito`}
+        onClick={() => addProductToCart(product)}
       >
         <svg
           width="18"

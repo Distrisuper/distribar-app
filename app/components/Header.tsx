@@ -1,10 +1,15 @@
+"use client";
+import { useCategoryStore } from "../store/categoryStore";
 export default function Header() {
+
+  const searchQuery = useCategoryStore((state) => state.searchQuery);
+  const setSearchQuery = useCategoryStore((state) => state.setSearchQuery);
+
   return (
-    <header className="w-full" style={{ backgroundColor: "#1E3A8A" }}>
+    <header className="w-full h-[15vh]" style={{ backgroundColor: "#1E3A8A" }}>
       <div className="flex flex-col px-4 pt-4 pb-3 max-w-[600px] mx-auto">
-        {/* Top section with title and cart icon */}
         <div className="flex items-center justify-between mb-3">
-          <h1 className="text-white text-xl font-bold">Distribar</h1>
+          <h1 className="text-white text-xl font-bold">LUMA</h1>
           <button 
             className="text-white p-2 -mr-2"
             aria-label="Shopping cart"
@@ -26,12 +31,13 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Search bar */}
         <div className="relative">
           <input
             type="text"
             placeholder="Busca platos, bebidas..."
             className="w-full px-4 py-3 pr-12 bg-gray-100 rounded-full text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
             <svg
