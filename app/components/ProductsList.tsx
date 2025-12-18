@@ -2,20 +2,24 @@
 
 import ProductCard from "./ProductCard";
 import { useCategoryStore } from "../store/categoryStore";
+import { useCartStore } from "../store/cartStore";
 import { Product } from "../types/products/product";
 import { mockupProducts } from "../mockup/products";
 
 export default function ProductsList() {
   const selectedCategory = useCategoryStore((state) => state.selectedCategory);
   const searchQuery = useCategoryStore((state) => state.searchQuery);
+  const items = useCartStore((state) => state.items);
 
   const filteredProducts =
     selectedCategory === "Todos"
       ? mockupProducts.filter((product) => product.name.toLowerCase().includes(searchQuery.toLowerCase() ) || product.description.toLowerCase().includes(searchQuery.toLowerCase() ))
       : mockupProducts.filter((product) => (product.category === selectedCategory ) && (product.name.toLowerCase().includes(searchQuery.toLowerCase() ) || product.description.toLowerCase().includes(searchQuery.toLowerCase() )) );
 
+  const hasItemsInCart = items.length > 0;
+
   return (
-    <div className="max-w-[600px] mx-auto px-4 py-4 overflow-y-auto">
+    <div className={`max-w-[600px] mx-auto px-4 py-4 overflow-y-auto ${hasItemsInCart ? "pb-28" : ""}`}>
       <div className="flex flex-col gap-3">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (

@@ -7,9 +7,6 @@ const categories = [
   "Tragos",
   "Cervezas",
   "Comida",
-  "Vinos",
-  "Sin alcohol",
-  "Promociones",
   "Postres",
 ];
 

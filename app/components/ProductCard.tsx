@@ -23,7 +23,7 @@ export default function ProductCard({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden relative">
-      <div className="flex">
+      <div className="flex items-center">
         <div className="flex-1 p-4 flex flex-col justify-between min-h-[120px]">
           <div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">{name}</h3>
@@ -48,7 +48,7 @@ export default function ProductCard({
       </div>
 
       <button
-        className="absolute cursor-pointer bottom-2 right-2 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-105 transition-transform z-10"
+        className="absolute cursor-pointer bottom-2 right-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-105 transition-transform z-10"
         aria-label={`Agregar ${name} al carrito`}
         onClick={() => addProductToCart(product)}
       >

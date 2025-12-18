@@ -1,5 +1,7 @@
 "use client";
 import { useCategoryStore } from "../store/categoryStore";
+import Link from "next/link";
+
 export default function Header() {
 
   const searchQuery = useCategoryStore((state) => state.searchQuery);
@@ -10,25 +12,27 @@ export default function Header() {
       <div className="flex flex-col px-4 pt-4 pb-3 max-w-[600px] mx-auto">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-white text-xl font-bold">LUMA</h1>
-          <button 
-            className="text-white p-2 -mr-2"
-            aria-label="Shopping cart"
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          <Link href="/cart">
+            <button 
+              className="text-white p-2 -mr-2"
+              aria-label="Shopping cart"
             >
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <path d="M16 10a4 4 0 0 1-8 0" />
-            </svg>
-          </button>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+            </button>
+          </Link>
         </div>
 
         <div className="relative">

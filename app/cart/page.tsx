@@ -13,11 +13,7 @@ export default function CartPage() {
   const totalPrice = getTotalPrice();
 
   const handleSendOrder = () => {
-    try {
-      throw new Error("Test error: Este es un log para el hacker de Fede");
-    } catch (error) {
-      Sentry.captureException(error);
-    }
+    alert("Pedido enviado");
   };
 
   return (
@@ -27,7 +23,7 @@ export default function CartPage() {
         <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="flex items-center px-4 py-3">
             <button
-              onClick={() => router.back()}
+              onClick={() => router.push("/")}
               className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
               aria-label="Volver"
             >

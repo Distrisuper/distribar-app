@@ -32,5 +32,29 @@ export const mockupProducts: Product[] = [
     price: 4500,
     image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/patatas-bravas-spicy-sauce-bhJDWoMlbU83P4qNbDJraCBn18pRCm.jpg",
     category: "Comida",
+  },
+  {
+    id: 5,
+    name: "Cervveza Rubia Tirada",
+    description: "Pinta de cerveza rubia bien fría, suave y refrescante",
+    price: 1500,
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/craft-ipa-beer-glass-AdKdOsmgoRcLaP804wFSccit6Mj1pu.jpg",
+    category: "Cervezas",
+  },
+    {
+    id: 6,
+    name: "Cervveza Negra Stout",
+    description: "Cerveza oscura con notas a café y chocolate",
+    price: 1800,
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/stout-beer-dark-glass-g2KnFBSmVvx9OBxbcw7CK6wWOQ4oBB.jpg",
+    category: "Cervezas",
+  },
+  {
+    id: 7,
+    name: "Cheesecake de Frutos Rojos",
+    description: "Tarta de queso cremosa con coulis de frutos rojos",
+    price: 4800,
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/cheesecake-with-berries-UAZvU4fhjYdWYp015l2H7SGVs4BINi.jpg",
+    category: "Postres",
   }
 ];
