@@ -18,7 +18,7 @@ export default function CategoryFilter() {
   const setSelectedCategory = useCategoryStore((state) => state.setSelectedCategory);
 
   return (
-    <div className="w-full bg-gray-100 py-3 h-[8vh]">
+    <div className="w-full bg-gray-100 py-3">
       <div className="max-w-[600px] mx-auto px-4">
         <div className="flex gap-2 overflow-x-auto hide-scrollbar">
           {categories.map((category) => {

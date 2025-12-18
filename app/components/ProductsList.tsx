@@ -15,7 +15,7 @@ export default function ProductsList() {
       : mockupProducts.filter((product) => (product.category === selectedCategory ) && (product.name.toLowerCase().includes(searchQuery.toLowerCase() ) || product.description.toLowerCase().includes(searchQuery.toLowerCase() )) );
 
   return (
-    <div className="max-w-[600px] mx-auto px-4 py-4 h-[72vh] overflow-y-auto">
+    <div className="max-w-[600px] mx-auto px-4 py-4 overflow-y-auto">
       <div className="flex flex-col gap-3">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (

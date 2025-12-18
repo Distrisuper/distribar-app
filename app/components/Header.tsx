@@ -6,7 +6,7 @@ export default function Header() {
   const setSearchQuery = useCategoryStore((state) => state.setSearchQuery);
 
   return (
-    <header className="w-full h-[15vh]" style={{ backgroundColor: "#1E3A8A" }}>
+    <header className="w-full " style={{ backgroundColor: "#1E3A8A" }}>
       <div className="flex flex-col px-4 pt-4 pb-3 max-w-[600px] mx-auto">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-white text-xl font-bold">LUMA</h1>

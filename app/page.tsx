@@ -5,7 +5,7 @@ import ResumeCart from "@/components/ResumeCart";
 
 export default function Home() {
   return (
-    <div className="max-w-[600px] mx-auto relative h-screen bg-white">
+    <div className="max-w-[600px] mx-auto relative bg-white">
       <Header />
       <CategoryFilter />
       <ProductsList />

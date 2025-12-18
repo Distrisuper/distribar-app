@@ -36,7 +36,7 @@ export default function ProductCard({
           </p>
         </div>
 
-        <div className="relative w-28 h-28 flex-shrink-0">
+        <div className="relative w-28 h-28 shrink-0">
           <Image
             src={image}
             alt={name}
