@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { useCartStore } from "../store/cartStore";
 import { Product } from "@/types/products/product";
+import AddToCartButton from "./AddToCartButton";
 
 interface ProductCardProps {
   product: Product;
@@ -19,8 +19,6 @@ export default function ProductCard({
   price,
   image,
     }: ProductCardProps) {
-  const addProductToCart = useCartStore((state) => state.addProduct);
-
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden relative">
       <div className="flex items-center">
@@ -47,26 +45,7 @@ export default function ProductCard({
         </div>
       </div>
 
-      <button
-        className="absolute cursor-pointer bottom-2 right-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-105 transition-transform z-10"
-        aria-label={`Agregar ${name} al carrito`}
-        onClick={() => addProductToCart(product)}
-      >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-gray-900"
-        >
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-      </button>
+      <AddToCartButton product={product} />
     </div>
   );
 }
