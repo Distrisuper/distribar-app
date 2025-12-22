@@ -8,7 +8,7 @@ interface AuthStore {
   checkAuth: () => void;
 }
 
-const STAFF_PASSWORD = "staff123";
+const STAFF_PASSWORD = process.env.NEXT_PUBLIC_STAFF_PASSWORD;
 const AUTH_COOKIE_NAME = "staff_auth_token";
 
 // Valor inicial seguro para SSR (cacheado)
