@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "../store/cartStore";
 import CartItemCard from "../components/CartItemCard";
 import * as Sentry from "@sentry/nextjs";
 import { useUserStore } from "../store/userStore";
 import { v4 as uuidv4 } from 'uuid';
+import Swal from 'sweetalert2';
 
 const API_URL = process.env.NEXT_PUBLIC_LUMA_API;
 
@@ -13,10 +15,12 @@ export default function CartPage() {
   const router = useRouter();
   const { items, clearCart, getTotalPrice } = useCartStore();
   const { orderContext } = useUserStore();
+  const [isSending, setIsSending] = useState(false);
 
   const totalPrice = getTotalPrice();
 
   const handleSendOrder = async () => {
+    setIsSending(true);
     try {
       const dataToSend = {
         location_type: orderContext?.type,
@@ -44,6 +48,16 @@ export default function CartPage() {
       }
       console.log(response);
       clearCart();
+      
+      // Mostrar mensaje de éxito con SweetAlert
+      await Swal.fire({
+        icon: 'success',
+        title: 'Pedido enviado correctamente',
+        text: 'Estamos preparando tu pedido',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#1E3A8A',
+      });
+      
       // Mantener los query params al redirigir para preservar el contexto
       const queryParams = orderContext 
         ? `?type=${orderContext.type}&id=${orderContext.id}`
@@ -52,6 +66,15 @@ export default function CartPage() {
     } catch (error) {
       console.error(error);
       Sentry.captureException(error);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo enviar el pedido. Por favor, intenta nuevamente.',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#1E3A8A',
+      });
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -120,8 +143,42 @@ export default function CartPage() {
               </div>
 
               {/* Botón Enviar pedido */}
-              <button onClick={handleSendOrder} className="w-full bg-gray-200 text-gray-900 font-medium py-3 rounded-lg hover:bg-gray-300 transition-colors">
-                Enviar pedido
+              <button 
+                onClick={handleSendOrder} 
+                disabled={isSending}
+                className={`w-full font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                  isSending 
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                    : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
+                }`}
+              >
+                {isSending ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-gray-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Enviando pedido...</span>
+                  </>
+                ) : (
+                  <span>Enviar pedido</span>
+                )}
               </button>
             </div>
           </div>

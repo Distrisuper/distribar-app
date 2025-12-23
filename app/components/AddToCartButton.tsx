@@ -17,7 +17,7 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
   const [showSelector, setShowSelector] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const cartItem = items.find((item) => item.product.id === product.id);
+  const cartItem = items.find((item) => item.product.COD_ARTICU === product.COD_ARTICU);
   const quantity = cartItem?.quantity || 0;
 
   const startTimer = () => {
@@ -30,18 +30,19 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
   };
 
   const handleAddClick = () => {
+    console.log("addProduct", product);
     addProduct(product);
     setShowSelector(true);
     startTimer();
   };
 
   const handleIncrease = () => {
-    increaseQuantity(product.id);
+    increaseQuantity(product.COD_ARTICU);
     startTimer();
   };
 
   const handleDecrease = () => {
-    decreaseQuantity(product.id);
+    decreaseQuantity(product.COD_ARTICU);
     if (quantity <= 1) {
       setShowSelector(false);
       if (timeoutRef.current) {
@@ -68,6 +69,9 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
       }
     }
   }, [quantity]);
+
+  console.log("showSelector", showSelector);
+  console.log("quantity", quantity);
 
   if (showSelector && quantity > 0) {
     return (
