@@ -4,20 +4,18 @@ import AddToCartButton from "./AddToCartButton";
 
 interface ProductCardProps {
   product: Product;
-  id: number;
   name: string;
   description: string;
-  price: number;
+  price: string;
   image: string;
 }
 
 export default function ProductCard({
   product,
-  id,
   name,
   description,
   price,
-  image,
+  image = 'https://guiagastronomica.net/wp-content/uploads/cerveza-radler-fresca-con-limon-68_1.webp',
     }: ProductCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden relative">
@@ -30,7 +28,7 @@ export default function ProductCard({
             </p>
           </div>
           <p className="text-lg font-bold text-gray-900 mt-3">
-            $ {price.toLocaleString("es-AR")}
+            $ {Number(price).toLocaleString("es-AR")}
           </p>
         </div>
 

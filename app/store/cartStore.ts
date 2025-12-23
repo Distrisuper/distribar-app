@@ -7,9 +7,9 @@ type CartState = {
   items: CartItem[];
 
   addProduct: (product: Product) => void;
-  removeProduct: (productId: number) => void;
-  increaseQuantity: (productId: number) => void;
-  decreaseQuantity: (productId: number) => void;
+  removeProduct: (productId: string) => void;
+  increaseQuantity: (productId: string) => void;
+  decreaseQuantity: (productId: string) => void;
   clearCart: () => void;
 
   getTotalItems: () => number;
@@ -22,13 +22,13 @@ export const useCartStore = create<CartState>((set, get) => ({
   addProduct: (product) =>
     set((state) => {
       const existing = state.items.find(
-        (item) => item.product.id === product.id
+        (item) => item.product.COD_ARTICU === product.COD_ARTICU
       );
 
       if (existing) {
         return {
           items: state.items.map((item) =>
-            item.product.id === product.id
+            item.product.COD_ARTICU === product.COD_ARTICU
               ? { ...item, quantity: item.quantity + 1 }
               : item
           ),
@@ -43,14 +43,14 @@ export const useCartStore = create<CartState>((set, get) => ({
   removeProduct: (productId) =>
     set((state) => ({
       items: state.items.filter(
-        (item) => item.product.id !== productId
+        (item) => item.product.COD_ARTICU !== productId
       ),
     })),
 
   increaseQuantity: (productId) =>
     set((state) => ({
       items: state.items.map((item) =>
-        item.product.id === productId
+        item.product.COD_ARTICU === productId
           ? { ...item, quantity: item.quantity + 1 }
           : item
       ),
@@ -60,7 +60,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     set((state) => ({
       items: state.items
         .map((item) =>
-          item.product.id === productId
+          item.product.COD_ARTICU === productId
             ? { ...item, quantity: item.quantity - 1 }
             : item
         )
@@ -74,7 +74,7 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   getTotalPrice: () =>
     get().items.reduce(
-      (acc, item) => acc + item.product.price * item.quantity,
+      (acc, item) => acc + Number(item.product.PRECIO_MOSTRADOR) * item.quantity,
       0
     ),
 }));

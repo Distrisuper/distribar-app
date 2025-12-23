@@ -1,4 +1,4 @@
-export type OrderStatus = "activo" | "bar" | "cocina" | "completado";
+export type OrderStatus = "pending" | "delivered";
 
 export type OrderItem = {
   name: string;
@@ -8,9 +8,9 @@ export type OrderItem = {
 
 export type Order = {
   id: string;
-  orderNumber: string;
+  location_type: string;
+  location_id: number;
   time: string;
-  location: string; // "Cama 12", "Mesa 5", etc.
   items: OrderItem[];
   status: OrderStatus;
 };

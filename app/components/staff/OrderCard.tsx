@@ -6,7 +6,7 @@ interface OrderCardProps {
 }
 
 export default function OrderCard({ order, onMarkComplete }: OrderCardProps) {
-  const isCompleted = order.status === "completado";
+  const isCompleted = order.status === "delivered";
   const showCompleteButton = !isCompleted;
 
   return (
@@ -45,7 +45,7 @@ export default function OrderCard({ order, onMarkComplete }: OrderCardProps) {
       )}
 
       {/* Información del pedido */}
-      <div className={showCompleteButton ? "pr-32" : "pr-28"}>
+      <div >
         <div
           className={`text-sm mb-1 ${
             isCompleted ? "text-gray-400" : "text-gray-600"
@@ -58,7 +58,7 @@ export default function OrderCard({ order, onMarkComplete }: OrderCardProps) {
             isCompleted ? "text-gray-500" : "text-gray-900"
           }`}
         >
-          Pedido #{order.orderNumber}
+          Pedido #{order.id}
         </div>
         <div
           className={`inline-block text-sm font-medium px-3 py-1 rounded-full mb-4 ${
@@ -67,7 +67,7 @@ export default function OrderCard({ order, onMarkComplete }: OrderCardProps) {
               : "bg-green-100 text-green-800"
           }`}
         >
-          {order.location}
+          {order.location_type} {order.location_id}
         </div>
 
         {/* Items del pedido */}

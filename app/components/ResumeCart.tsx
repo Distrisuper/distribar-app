@@ -8,7 +8,7 @@ export default function ResumeCart() {
 
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
   const totalPrice = items.reduce(
-    (acc, item) => acc + item.quantity * item.product.price,
+    (acc, item) => acc + item.quantity * item.product.PRECIO_MOSTRADOR,
     0
   );
 

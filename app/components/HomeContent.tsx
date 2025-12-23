@@ -16,7 +16,6 @@ export default function HomeContent() {
     const id = params.get("id");
     if (type && id) {
       setOrderContext({ type, id });
-      alert(`Orden creada para ${type} ${id}`);
     } else {
       clearOrderContext();
     }

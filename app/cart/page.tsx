@@ -5,17 +5,50 @@ import { useCartStore } from "../store/cartStore";
 import CartItemCard from "../components/CartItemCard";
 import * as Sentry from "@sentry/nextjs";
 import { useUserStore } from "../store/userStore";
+import { v4 as uuidv4 } from 'uuid';
+
+const API_URL = process.env.NEXT_PUBLIC_LUMA_API;
 
 export default function CartPage() {
   const router = useRouter();
-  const items = useCartStore((state) => state.items);
-  const getTotalPrice = useCartStore((state) => state.getTotalPrice);
+  const { items, clearCart, getTotalPrice } = useCartStore();
   const { orderContext } = useUserStore();
 
   const totalPrice = getTotalPrice();
 
-  const handleSendOrder = () => {
-    alert(`Pedido enviado para ${orderContext?.type} ${orderContext?.id}`);
+  const handleSendOrder = async () => {
+    try {
+      const dataToSend = {
+        location_type: orderContext?.type,
+        location_id: orderContext?.id,
+        status: 'pending',
+        products: items.map((item) => ({
+          product_id: '001',
+          quantity: item.quantity,
+          name: item.product.DESCRIPCION,
+          price: Number(item.product.PRECIO_MOSTRADOR),
+          area: 'bar',
+          status: 'pending',
+        })),
+      }
+
+      const response = await fetch(`${API_URL}/v1/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
+      if(!response.ok) {
+        throw new Error('Failed to send order');
+      }
+      console.log(response);
+      clearCart();
+      router.push('/');
+    } catch (error) {
+      console.error(error);
+      Sentry.captureException(error);
+    }
   };
 
   return (
@@ -55,7 +88,7 @@ export default function CartPage() {
           {items.length > 0 ? (
             <div className="flex flex-col gap-3 mb-24">
               {items.map((item) => (
-                <CartItemCard key={item.product.id} item={item} />
+                <CartItemCard key={uuidv4()} item={item} />
               ))}
             </div>
           ) : (

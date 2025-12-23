@@ -17,16 +17,18 @@ export default function StaffPanel() {
   const selectedFilter = useOrdersStore((state) => state.selectedFilter);
   const setSelectedFilter = useOrdersStore((state) => state.setSelectedFilter);
   const orders = useOrdersStore((state) => state.orders);
+  const setOrders = useOrdersStore((state) => state.setOrders);
   const markAsComplete = useOrdersStore((state) => state.markAsComplete);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
-  // Memoizar los pedidos filtrados para evitar re-renders innecesarios
   const filteredOrders = useMemo(
     () => orders.filter((order) => order.status === selectedFilter),
     [orders, selectedFilter]
   );
 
   useEffect(() => {
-    // Verificar cookie al cargar la página (solo en cliente)
     if (typeof window !== "undefined") {
       checkAuth();
       setIsChecking(false);
@@ -39,6 +41,38 @@ export default function StaffPanel() {
     }
   }, [isAuthenticated, isChecking, router]);
 
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const baseUrl = process.env.NEXT_PUBLIC_LUMA_API;
+      if (!baseUrl) {
+        setOrdersError("Falta la variable NEXT_PUBLIC_LUMA_API");
+        return;
+      }
+      setLoadingOrders(true);
+      setOrdersError(null);
+      try {
+        const response = await fetch(`${baseUrl}/v1/orders/`);
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}`);
+        }
+        const data = await response.json();
+        setOrders(data.data);
+      } catch (error) {
+        setOrdersError(
+          error instanceof Error ? error.message : "Error al cargar pedidos"
+        );
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+
+    fetchOrders();
+  }, [setOrders]);
+
+  useEffect(() => {
+console.log(orders);
+  },[orders])
+
   const handleLogout = () => {
     logout();
     router.push("/staff/login");
@@ -49,11 +83,35 @@ export default function StaffPanel() {
   };
 
   const filters: { label: string; value: OrderStatus }[] = [
-    { label: "Activo", value: "activo" },
-    { label: "Bar", value: "bar" },
-    { label: "Cocina", value: "cocina" },
-    { label: "Completado", value: "completado" },
+    { label: "Activo", value: "pending" },
+    { label: "Completado", value: "delivered" },
   ];
+
+  const handleMarkComplete = async (orderId: string) => {
+    const baseUrl = process.env.NEXT_PUBLIC_LUMA_API;
+    if (!baseUrl) {
+      setOrdersError("Falta la variable NEXT_PUBLIC_LUMA_API");
+      return;
+    }
+    setUpdatingOrderId(orderId);
+    try {
+      const response = await fetch(`${baseUrl}/v1/orders/${orderId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "delivered" }),
+      });
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}`);
+      }
+      markAsComplete(orderId);
+    } catch (error) {
+      setOrdersError(
+        error instanceof Error ? error.message : "Error al actualizar el pedido"
+      );
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
 
   if (isChecking) {
     return (
@@ -128,13 +186,17 @@ export default function StaffPanel() {
 
         {/* Lista de pedidos */}
         <div className="px-4 py-4">
-          {filteredOrders.length > 0 ? (
+          {loadingOrders ? (
+            <div className="text-center py-12 text-gray-500">Cargando pedidos...</div>
+          ) : ordersError ? (
+            <div className="text-center py-12 text-red-500">Error: {ordersError}</div>
+          ) : filteredOrders.length > 0 ? (
             <div className="flex flex-col gap-4">
               {filteredOrders.map((order) => (
                 <OrderCard
                   key={order.id}
                   order={order}
-                  onMarkComplete={() => markAsComplete(order.id)}
+                  onMarkComplete={() => handleMarkComplete(order.id)}
                 />
               ))}
             </div>

@@ -3,11 +3,13 @@
 import { useCategoryStore } from "../store/categoryStore";
 
 const categories = [
-  "Todos",
-  "Tragos",
-  "Cervezas",
-  "Comida",
-  "Postres",
+  "ALQUILER DE EVENTOS",
+  "BEBIDAS ALCOHOLICAS",
+  "BEBIDAS SIN ALCOHOL",
+  "CAFETERIA",
+  "COMIDA",
+  "PASTELERIA",
+  "POSTRES"
 ];
 
 export default function CategoryFilter() {

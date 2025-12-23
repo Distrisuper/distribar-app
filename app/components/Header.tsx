@@ -1,17 +1,28 @@
 "use client";
 import { useCategoryStore } from "../store/categoryStore";
+import { useUserStore } from "../store/userStore";
 import Link from "next/link";
 
 export default function Header() {
 
   const searchQuery = useCategoryStore((state) => state.searchQuery);
   const setSearchQuery = useCategoryStore((state) => state.setSearchQuery);
+  const orderContext = useUserStore((state) => state.orderContext);
 
   return (
     <header className="w-full " style={{ backgroundColor: "#1E3A8A" }}>
       <div className="flex flex-col px-4 pt-4 pb-3 max-w-[600px] mx-auto">
         <div className="flex items-center justify-between mb-3">
-          <h1 className="text-white text-xl font-bold">LUMA</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-white text-xl font-bold">LUMA</h1>
+            {orderContext && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/20 rounded-full">
+                <span className="text-white text-xs font-medium capitalize">
+                  {orderContext.type} {orderContext.id}
+                </span>
+              </div>
+            )}
+          </div>
           <Link href="/cart">
             <button 
               className="text-white p-2 -mr-2"
