@@ -16,10 +16,9 @@ export default function HomeContent() {
     const id = params.get("id");
     if (type && id) {
       setOrderContext({ type, id });
-    } else {
-      clearOrderContext();
     }
-  }, [params]);
+    // No borrar el contexto si no hay params, para preservar la información del usuario
+  }, [params, setOrderContext]);
   return (
     <div className="max-w-[600px] mx-auto relative bg-white">
       <Header />
