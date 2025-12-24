@@ -30,7 +30,6 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
   };
 
   const handleAddClick = () => {
-    console.log("addProduct", product);
     addProduct(product);
     setShowSelector(true);
     startTimer();
@@ -69,9 +68,6 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
       }
     }
   }, [quantity]);
-
-  console.log("showSelector", showSelector);
-  console.log("quantity", quantity);
 
   if (showSelector && quantity > 0) {
     return (
