@@ -1,5 +1,6 @@
 import { Order } from "@/types/orders/order";
 import { formatPrice } from "@/utils/priceUtils";
+import formatDate from "@/utils/dateUtils";
 
 interface OrderCardProps {
   order: Order;
@@ -47,6 +48,15 @@ export default function OrderCard({ order, onMarkComplete }: OrderCardProps) {
 
       {/* Información del pedido */}
       <div >
+        {order.created_at && (
+          <div
+            className={`text-sm mb-1 ${
+              isCompleted ? "text-gray-400" : "text-gray-600"
+            }`}
+          >
+            {formatDate(order.created_at)}
+          </div>
+        )}
         <div
           className={`text-sm mb-1 ${
             isCompleted ? "text-gray-400" : "text-gray-600"

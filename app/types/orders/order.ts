@@ -11,6 +11,7 @@ export type Order = {
   location_type: string;
   location_id: number;
   time: string;
+  created_at?: string;
   items: OrderItem[];
   status: OrderStatus;
 };

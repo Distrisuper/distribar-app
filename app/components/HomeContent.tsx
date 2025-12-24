@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 import { useUserStore } from "../store/userStore";
 
 export default function HomeContent() {
-  const { setOrderContext, clearOrderContext } = useUserStore();
+  const { setOrderContext } = useUserStore();
   const params = useSearchParams();
 
   useEffect(() => {
