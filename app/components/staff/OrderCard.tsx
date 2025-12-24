@@ -1,4 +1,5 @@
 import { Order } from "@/types/orders/order";
+import { formatPrice } from "@/utils/priceUtils";
 
 interface OrderCardProps {
   order: Order;
@@ -88,7 +89,7 @@ export default function OrderCard({ order, onMarkComplete }: OrderCardProps) {
                   isCompleted ? "text-gray-400" : "text-gray-900"
                 }`}
               >
-                $ {item.price.toLocaleString("es-AR")}
+                $ {formatPrice(item.price)}
               </span>
             </div>
           ))}

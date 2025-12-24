@@ -3,6 +3,7 @@ import Header from "./Header";
 import CategoryFilter from "./CategoryFilter";
 import ProductsList from "./ProductsList";
 import ResumeCart from "./ResumeCart";
+import QRValidator from "./QRValidator";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUserStore } from "../store/userStore";
@@ -21,6 +22,7 @@ export default function HomeContent() {
   }, [params, setOrderContext]);
   return (
     <div className="max-w-[600px] mx-auto relative bg-white">
+      <QRValidator />
       <Header />
       <CategoryFilter />
       <ProductsList />

@@ -3,12 +3,13 @@
 import Image from "next/image";
 import { useCartStore } from "../store/cartStore";
 import { CartItem } from "@/types/cart/cartItem";
+import { memo } from "react";
 
 interface CartItemCardProps {
   item: CartItem;
 }
 
-export default function CartItemCard({ item }: CartItemCardProps) {
+function CartItemCard({ item }: CartItemCardProps) {
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
 
@@ -89,3 +90,4 @@ export default function CartItemCard({ item }: CartItemCardProps) {
   );
 }
 
+export default memo(CartItemCard);

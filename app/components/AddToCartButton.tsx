@@ -74,7 +74,7 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
       <div className="absolute bottom-2 right-2 z-10 flex items-center gap-1 bg-white rounded-full shadow-lg px-1.5 py-1 animate-fade-in-scale">
         <button
           onClick={handleDecrease}
-          className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100 active:scale-95 transition-all duration-150"
+          className="cursor-pointer w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100 active:scale-95 transition-all duration-150"
           aria-label="Decrease quantity"
         >
           <svg
@@ -98,7 +98,7 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
 
         <button
           onClick={handleIncrease}
-          className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100 active:scale-95 transition-all duration-150"
+          className="cursor-pointer w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-100 active:scale-95 transition-all duration-150"
           aria-label="Increase quantity"
         >
           <svg

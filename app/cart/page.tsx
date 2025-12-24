@@ -6,14 +6,16 @@ import { useCartStore } from "../store/cartStore";
 import CartItemCard from "../components/CartItemCard";
 import * as Sentry from "@sentry/nextjs";
 import { useUserStore } from "../store/userStore";
-import { v4 as uuidv4 } from 'uuid';
 import Swal from 'sweetalert2';
 
 const API_URL = process.env.NEXT_PUBLIC_LUMA_API;
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, clearCart, getTotalPrice } = useCartStore();
+  const items = useCartStore((state) => state.items);
+  const clearCart = useCartStore((state) => state.clearCart);
+  const getTotalPrice = useCartStore((state) => state.getTotalPrice);
+
   const { orderContext } = useUserStore();
   const [isSending, setIsSending] = useState(false);
 
@@ -46,7 +48,6 @@ export default function CartPage() {
       if(!response.ok) {
         throw new Error('Failed to send order');
       }
-      console.log(response);
       clearCart();
       
       // Mostrar mensaje de éxito con SweetAlert
@@ -64,7 +65,6 @@ export default function CartPage() {
         : '';
       router.push(`/${queryParams}`);
     } catch (error) {
-      console.error(error);
       Sentry.captureException(error);
       await Swal.fire({
         icon: 'error',
@@ -77,6 +77,8 @@ export default function CartPage() {
       setIsSending(false);
     }
   };
+
+  console.log(items);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -120,7 +122,7 @@ export default function CartPage() {
           {items.length > 0 ? (
             <div className="flex flex-col gap-3 mb-24">
               {items.map((item) => (
-                <CartItemCard key={uuidv4()} item={item} />
+                <CartItemCard key={item.product.COD_ARTICU} item={item} />
               ))}
             </div>
           ) : (
