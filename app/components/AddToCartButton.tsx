@@ -1,6 +1,4 @@
 "use client";
-
-import { useState, useEffect, useRef } from "react";
 import { useCartStore } from "../store/cartStore";
 import { Product } from "@/types/products/product";
 
@@ -14,62 +12,22 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
 
-  const [showSelector, setShowSelector] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const cartItem = items.find((item) => item.product.COD_ARTICU === product.COD_ARTICU);
   const quantity = cartItem?.quantity || 0;
 
-  const startTimer = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(() => {
-      setShowSelector(false);
-    }, 3000);
-  };
-
   const handleAddClick = () => {
     addProduct(product);
-    setShowSelector(true);
-    startTimer();
   };
 
   const handleIncrease = () => {
     increaseQuantity(product.COD_ARTICU);
-    startTimer();
   };
 
   const handleDecrease = () => {
     decreaseQuantity(product.COD_ARTICU);
-    if (quantity <= 1) {
-      setShowSelector(false);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    } else {
-      startTimer();
-    }
   };
 
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (quantity === 0 && showSelector) {
-      setShowSelector(false);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    }
-  }, [quantity]);
-
-  if (showSelector && quantity > 0) {
+  if (quantity > 0) {
     return (
       <div className="absolute bottom-2 right-2 z-10 flex items-center gap-1 bg-white rounded-full shadow-lg px-1.5 py-1 animate-fade-in-scale">
         <button

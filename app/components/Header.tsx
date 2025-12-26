@@ -2,6 +2,7 @@
 import { useCategoryStore } from "../store/categoryStore";
 import { useUserStore } from "../store/userStore";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Header() {
 
@@ -10,11 +11,18 @@ export default function Header() {
   const orderContext = useUserStore((state) => state.orderContext);
 
   return (
-    <header className="w-full " style={{ backgroundColor: "#1E3A8A" }}>
+    <header className="w-full " style={{ backgroundColor: "#142A3B" }}>
       <div className="flex flex-col px-4 pt-4 pb-3 max-w-[600px] mx-auto">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <h1 className="text-white text-xl font-bold">LUMA</h1>
+            <Image
+              src="/images/Logo_luma_arena.png"
+              alt="LUMA"
+              width={100}
+              height={40}
+              className="h-8 w-auto"
+              priority
+            />
             {orderContext && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/20 rounded-full">
                 <span className="text-white text-xs font-medium capitalize">

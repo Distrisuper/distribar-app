@@ -202,7 +202,7 @@ console.log(orders);
             </div>
           ) : (
             <div className="text-center py-12 text-gray-500">
-              <p>No hay pedidos en esta categoría</p>
+              <p>No hay pedidos {selectedFilter}</p>
             </div>
           )}
         </div>

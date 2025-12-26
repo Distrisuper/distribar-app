@@ -18,20 +18,14 @@ function CartItemCard({ item }: CartItemCardProps) {
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex items-center gap-3">
-      {/* Imagen del producto */}
-      <div className="relative w-20 h-20 shrink-0">
-        <Image
-          src='https://guiagastronomica.net/wp-content/uploads/cerveza-radler-fresca-con-limon-68_1.webp'
-          alt={product.DESCRIPCION}
-          fill
-          className="object-cover rounded"
-          sizes="80px"
-        />
-      </div>
-
       {/* Información y controles */}
       <div className="flex-1 flex flex-col gap-2">
         <h3 className="text-base font-medium text-gray-900">{product.DESCRIPCION}</h3>
+        
+        {/* Precio */}
+        <p className="text-lg font-bold text-gray-900">
+          $ {totalPrice.toLocaleString("es-AR")}
+        </p>
         
         {/* Selector de cantidad */}
         <div className="flex items-center gap-2">
@@ -82,9 +76,15 @@ function CartItemCard({ item }: CartItemCardProps) {
         </div>
       </div>
 
-      {/* Precio total */}
-      <div className="text-lg font-bold text-gray-900">
-        $ {totalPrice.toLocaleString("es-AR")}
+      {/* Imagen del producto */}
+      <div className="relative w-28 h-28 shrink-0">
+        <Image
+          src='https://guiagastronomica.net/wp-content/uploads/cerveza-radler-fresca-con-limon-68_1.webp'
+          alt={product.DESCRIPCION}
+          fill
+          className="object-cover rounded"
+          sizes="112px"
+        />
       </div>
     </div>
   );

@@ -23,13 +23,24 @@ export default function CartPage() {
 
   const handleSendOrder = async () => {
     setIsSending(true);
+    if(!orderContext?.type || !orderContext?.id) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'No es posible enviar el pedido',
+        text: 'Por favor, escanea el QR de la mesa o carpa previamente para enviar el pedido.',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#1E3A8A',
+      });
+      setIsSending(false);
+      return;
+    }
     try {
       const dataToSend = {
         location_type: orderContext?.type,
         location_id: orderContext?.id,
         status: 'pending',
         products: items.map((item) => ({
-          product_id: '001',
+          product_id: item.product.COD_ARTICU,
           quantity: item.quantity,
           name: item.product.DESCRIPCION,
           price: Number(item.product.PRECIO_MOSTRADOR),
@@ -78,10 +89,8 @@ export default function CartPage() {
     }
   };
 
-  console.log(items);
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 w-full ">
       <div className="max-w-[600px] mx-auto bg-white min-h-screen">
         {/* Header */}
         <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -134,12 +143,12 @@ export default function CartPage() {
 
         {/* Resumen y botón de envío */}
         {items.length > 0 && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+          <div className="fixed bottom-0 left-0 right-0 bg-gray-100 border-t border-gray-200">
             <div className="max-w-[600px] mx-auto px-4 py-4">
               {/* Total */}
               <div className="flex justify-between items-center mb-4">
                 <span className="text-base font-medium text-gray-700">Total</span>
-                <span className="text-xl font-bold text-gray-900">
+                <span className="text-2xl font-bold text-gray-900">
                   $ {totalPrice.toLocaleString("es-AR")}
                 </span>
               </div>

@@ -9,7 +9,6 @@ interface OrderCardProps {
 
 export default function OrderCard({ order, onMarkComplete }: OrderCardProps) {
   const isCompleted = order.status === "delivered";
-  const showCompleteButton = !isCompleted;
 
   return (
     <div
@@ -42,7 +41,7 @@ export default function OrderCard({ order, onMarkComplete }: OrderCardProps) {
           onClick={onMarkComplete}
           className="absolute top-4 right-4 bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
-          Marcar completo
+          Completar
         </button>
       )}
 
@@ -91,7 +90,7 @@ export default function OrderCard({ order, onMarkComplete }: OrderCardProps) {
               <span
                 className={isCompleted ? "text-gray-400" : "text-gray-700"}
               >
-                <span className="font-semibold">{item.quantity}x</span>{" "}
+                <span className="text-base font-bold">{item.quantity}</span>{" "}
                 {item.name}
               </span>
               <span
