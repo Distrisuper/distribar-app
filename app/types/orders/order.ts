@@ -1,9 +1,12 @@
 export type OrderStatus = "pending" | "delivered";
+export type OrderItemsStatus = "pending" | "delivered";
 
 export type OrderItem = {
   name: string;
   quantity: number;
   price: number;
+  area: string;
+  status: OrderItemsStatus;
 };
 
 export type Order = {

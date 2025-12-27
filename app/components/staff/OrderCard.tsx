@@ -5,10 +5,11 @@ import formatDate from "@/utils/dateUtils";
 interface OrderCardProps {
   order: Order;
   onMarkComplete: () => void;
+  hideCompleteButton?: boolean;
 }
 
-export default function OrderCard({ order, onMarkComplete }: OrderCardProps) {
-  const isCompleted = order.status === "delivered";
+export default function OrderCard({ order, onMarkComplete, hideCompleteButton = false }: OrderCardProps) {
+  const isCompleted = order.items.length > 0 && order.items.every((item) => item.status === "delivered");
 
   return (
     <div
@@ -36,14 +37,14 @@ export default function OrderCard({ order, onMarkComplete }: OrderCardProps) {
           </svg>
           <span className="text-sm text-gray-400 font-medium">Completado</span>
         </div>
-      ) : (
+      ) : !hideCompleteButton ? (
         <button
           onClick={onMarkComplete}
           className="absolute top-4 right-4 bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Completar
         </button>
-      )}
+      ) : null}
 
       {/* Información del pedido */}
       <div >

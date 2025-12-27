@@ -7,6 +7,7 @@ import CartItemCard from "../components/CartItemCard";
 import * as Sentry from "@sentry/nextjs";
 import { useUserStore } from "../store/userStore";
 import Swal from 'sweetalert2';
+import { decideAreaFromRubro } from "../utils/areaUtils";
 
 const API_URL = process.env.NEXT_PUBLIC_LUMA_API;
 
@@ -44,7 +45,7 @@ export default function CartPage() {
           quantity: item.quantity,
           name: item.product.DESCRIPCION,
           price: Number(item.product.PRECIO_MOSTRADOR),
-          area: 'bar',
+          area: decideAreaFromRubro(item.product.RUBRO),
           status: 'pending',
         })),
       }

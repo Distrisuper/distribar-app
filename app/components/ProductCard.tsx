@@ -15,7 +15,7 @@ export default function ProductCard({
   name,
   description,
   price,
-  image = 'https://guiagastronomica.net/wp-content/uploads/cerveza-radler-fresca-con-limon-68_1.webp',
+  image = '/images/luma.jpg',
     }: ProductCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden relative">
@@ -39,6 +39,7 @@ export default function ProductCard({
             fill
             className="object-cover"
             sizes="112px"
+            unoptimized={image.startsWith('/images/')}
           />
         </div>
       </div>

@@ -3,9 +3,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../store/authStore";
-import { useOrdersStore } from "../store/ordersStore";
+import { useOrdersStore, OrderFilter } from "../store/ordersStore";
 import OrderCard from "../components/staff/OrderCard";
-import { OrderStatus } from "../types/orders/order";
 
 export default function StaffPanel() {
   const router = useRouter();
@@ -23,10 +22,65 @@ export default function StaffPanel() {
   const [ordersError, setOrdersError] = useState<string | null>(null);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
-  const filteredOrders = useMemo(
-    () => orders.filter((order) => order.status === selectedFilter),
-    [orders, selectedFilter]
-  );
+  const filteredOrders = useMemo(() => {
+    const filter = selectedFilter;
+    
+    if (!orders || orders.length === 0) {
+      return [];
+    }
+    
+    if (filter === "pending" || filter === "delivered") {
+      return orders
+        .filter((order) => {
+          // Verificar que el order tenga items
+          if (!order.items || order.items.length === 0) return false;
+          // Si los items no tienen status, usar el status del pedido como fallback
+          const hasItemsWithStatus = order.items.some((item) => item?.status === filter);
+          // Si ningún item tiene status, usar el status del pedido
+          const hasNoItemStatus = !order.items.some((item) => item?.status);
+          if (hasNoItemStatus && order.status === filter) {
+            return true;
+          }
+          return hasItemsWithStatus;
+        })
+        .map((order) => {
+          const filteredItems = order.items.filter((item) => {
+            // Si el item tiene status, filtrar por status
+            if (item?.status) {
+              return item.status === filter;
+            }
+            // Si no tiene status, usar el status del pedido
+            return order.status === filter;
+          });
+          return {
+            ...order,
+            items: filteredItems,
+          };
+        })
+        .filter((order) => order.items.length > 0);
+    }
+    
+    if (filter === "bar" || filter === "kitchen") {
+      return orders
+        .filter((order) => {
+          if (!order.items || order.items.length === 0) return false;
+          // Solo mostrar pedidos activos cuando se filtra por área
+          if (order.status !== "pending") return false;
+          return order.items.some(
+            (item) => item?.area === filter && (item?.status === "pending" || !item?.status)
+          );
+        })
+        .map((order) => ({
+          ...order,
+          items: order.items.filter(
+            (item) => item?.area === filter && (item?.status === "pending" || !item?.status)
+          ),
+        }))
+        .filter((order) => order.items.length > 0);
+    }
+    
+    return orders;
+  }, [orders, selectedFilter]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -69,10 +123,6 @@ export default function StaffPanel() {
     fetchOrders();
   }, [setOrders]);
 
-  useEffect(() => {
-console.log(orders);
-  },[orders])
-
   const handleLogout = () => {
     logout();
     router.push("/staff/login");
@@ -82,8 +132,10 @@ console.log(orders);
     router.push("/");
   };
 
-  const filters: { label: string; value: OrderStatus }[] = [
+  const filters: { label: string; value: OrderFilter }[] = [
     { label: "Activo", value: "pending" },
+    { label: "Bar", value: "bar" },
+    { label: "Cocina", value: "kitchen" },
     { label: "Completado", value: "delivered" },
   ];
 
@@ -98,12 +150,12 @@ console.log(orders);
       const response = await fetch(`${baseUrl}/v1/orders/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "delivered" }),
+        body: JSON.stringify({ status: "delivered", area: selectedFilter }),
       });
       if (!response.ok) {
         throw new Error(`Error ${response.status}`);
       }
-      markAsComplete(orderId);
+      markAsComplete(orderId, selectedFilter);
     } catch (error) {
       setOrdersError(
         error instanceof Error ? error.message : "Error al actualizar el pedido"
@@ -197,12 +249,24 @@ console.log(orders);
                   key={order.id}
                   order={order}
                   onMarkComplete={() => handleMarkComplete(order.id)}
+                  hideCompleteButton={selectedFilter === "pending" || selectedFilter === "delivered"}
                 />
               ))}
             </div>
           ) : (
             <div className="text-center py-12 text-gray-500">
-              <p>No hay pedidos {selectedFilter}</p>
+              <p>
+                No hay pedidos{" "}
+                {selectedFilter === "pending"
+                  ? "activos"
+                  : selectedFilter === "delivered"
+                  ? "completados"
+                  : selectedFilter === "bar"
+                  ? "de bar"
+                  : selectedFilter === "kitchen"
+                  ? "de cocina"
+                  : selectedFilter}
+              </p>
             </div>
           )}
         </div>

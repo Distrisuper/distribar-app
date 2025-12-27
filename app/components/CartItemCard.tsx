@@ -77,13 +77,14 @@ function CartItemCard({ item }: CartItemCardProps) {
       </div>
 
       {/* Imagen del producto */}
-      <div className="relative w-28 h-28 shrink-0">
+      <div className="relative w-28 h-28 shrink-0 bg-gray-100">
         <Image
-          src='https://guiagastronomica.net/wp-content/uploads/cerveza-radler-fresca-con-limon-68_1.webp'
+          src='/images/luma.jpg'
           alt={product.DESCRIPCION}
           fill
           className="object-cover rounded"
           sizes="112px"
+          unoptimized
         />
       </div>
     </div>
