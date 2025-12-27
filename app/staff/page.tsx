@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "../store/authStore";
 import { useOrdersStore, OrderFilter } from "../store/ordersStore";
 import OrderCard from "../components/staff/OrderCard";
 
-export default function StaffPanel() {
+function StaffPanelContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -333,6 +333,20 @@ export default function StaffPanel() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function StaffPanel() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-gray-600">Cargando...</div>
+        </div>
+      }
+    >
+      <StaffPanelContent />
+    </Suspense>
   );
 }
 
