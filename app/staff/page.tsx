@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "../store/authStore";
 import { useOrdersStore, OrderFilter } from "../store/ordersStore";
 import OrderCard from "../components/staff/OrderCard";
 
 export default function StaffPanel() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const logout = useAuthStore((state) => state.logout);
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -21,6 +22,32 @@ export default function StaffPanel() {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [ordersError, setOrdersError] = useState<string | null>(null);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+
+  const getFilterFromParams = (): OrderFilter => {
+    const status = searchParams.get("status");
+    const area = searchParams.get("area");
+    
+    if (status === "active") return "pending";
+    if (status === "completed") return "delivered";
+    if (area === "bar") return "bar";
+    if (area === "kitchen") return "kitchen";
+    
+    return "pending";
+  };
+
+  const updateUrlFromFilter = (filter: OrderFilter) => {
+    const params = new URLSearchParams();
+    
+    if (filter === "pending") {
+      params.set("status", "active");
+    } else if (filter === "delivered") {
+      params.set("status", "completed");
+    } else if (filter === "bar" || filter === "kitchen") {
+      params.set("area", filter);
+    }
+    
+    router.replace(`/staff?${params.toString()}`);
+  };
 
   const filteredOrders = useMemo(() => {
     const filter = selectedFilter;
@@ -88,6 +115,21 @@ export default function StaffPanel() {
       setIsChecking(false);
     }
   }, [checkAuth]);
+
+  // Sincronizar filtro desde query params al cargar
+  useEffect(() => {
+    if (!isChecking) {
+      // Si no hay query params, establecer por defecto
+      if (!searchParams.get("status") && !searchParams.get("area")) {
+        router.replace("/staff?status=active");
+        setSelectedFilter("pending");
+      } else {
+        // Leer filtro desde query params
+        const filterFromParams = getFilterFromParams();
+        setSelectedFilter(filterFromParams);
+      }
+    }
+  }, [isChecking, searchParams, router, setSelectedFilter]);
 
   useEffect(() => {
     if (!isChecking && !isAuthenticated) {
@@ -183,7 +225,7 @@ export default function StaffPanel() {
         {/* Header */}
         <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="px-4 py-3">
-            {/* Título y botón salir */}
+            {/* Título y botón refrescar */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <button
@@ -210,10 +252,25 @@ export default function StaffPanel() {
                 </h1>
               </div>
               <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => window.location.reload()}
+                className="px-2.5 py-1 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-md transition-colors flex items-center gap-1"
               >
-                Salir
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                  <path d="M21 3v5h-5" />
+                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                  <path d="M3 21v-5h5" />
+                </svg>
+                Refrescar
               </button>
             </div>
 
@@ -222,7 +279,10 @@ export default function StaffPanel() {
               {filters.map((filter) => (
                 <button
                   key={filter.value}
-                  onClick={() => setSelectedFilter(filter.value)}
+                  onClick={() => {
+                    setSelectedFilter(filter.value);
+                    updateUrlFromFilter(filter.value);
+                  }}
                   className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                     selectedFilter === filter.value
                       ? "bg-blue-600 text-white"
@@ -250,6 +310,7 @@ export default function StaffPanel() {
                   order={order}
                   onMarkComplete={() => handleMarkComplete(order.id)}
                   hideCompleteButton={selectedFilter === "pending" || selectedFilter === "delivered"}
+                  isUpdating={updatingOrderId === order.id}
                 />
               ))}
             </div>
