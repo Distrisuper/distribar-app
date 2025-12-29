@@ -57,7 +57,7 @@ function StaffPanelContent() {
     }
     
     if (filter === "pending" || filter === "delivered") {
-      return orders
+      const filtered = orders
         .filter((order) => {
           // Verificar que el order tenga items
           if (!order.items || order.items.length === 0) return false;
@@ -85,6 +85,24 @@ function StaffPanelContent() {
           };
         })
         .filter((order) => order.items.length > 0);
+
+      if (filter === "delivered") {
+        return filtered.sort((a, b) => {
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          
+          if (dateA && dateB) {
+            return dateB - dateA;
+          }
+          
+          if (dateA && !dateB) return -1;
+          if (!dateA && dateB) return 1;
+          
+          return parseInt(b.id) - parseInt(a.id);
+        });
+      }
+
+      return filtered;
     }
     
     if (filter === "bar" || filter === "kitchen") {
