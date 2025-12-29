@@ -1,6 +1,10 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 import { Product } from "@/types/products/product";
 import AddToCartButton from "./AddToCartButton";
+import { getProductImageUrl } from "@/utils/imageUtils";
 
 interface ProductCardProps {
   product: Product;
@@ -17,6 +21,9 @@ export default function ProductCard({
   price,
   image = '/images/luma.jpg',
     }: ProductCardProps) {
+  const [hasError, setHasError] = useState(false);
+  const imageSrc = hasError ? '/images/luma.jpg' : getProductImageUrl(product.COD_ARTICU);
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden relative">
       <div className="flex items-center">
@@ -34,12 +41,13 @@ export default function ProductCard({
 
         <div className="relative w-28 h-28 shrink-0">
           <Image
-            src={image}
+            src={imageSrc}
             alt={name}
             fill
             className="object-cover"
             sizes="112px"
-            unoptimized={image.startsWith('/images/')}
+            unoptimized={imageSrc.startsWith('/images/')}
+            onError={() => setHasError(true)}
           />
         </div>
       </div>

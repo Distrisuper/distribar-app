@@ -3,7 +3,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "distrisuper-bucket-20250625.s3.us-east-1.amazonaws.com",
+      }
+    ],
   },
 };
 

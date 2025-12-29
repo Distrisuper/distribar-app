@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { useCartStore } from "../store/cartStore";
 import { CartItem } from "@/types/cart/cartItem";
 import { memo } from "react";
+import { getProductImageUrl } from "@/utils/imageUtils";
 
 interface CartItemCardProps {
   item: CartItem;
@@ -15,6 +17,8 @@ function CartItemCard({ item }: CartItemCardProps) {
 
   const { product, quantity } = item;
   const totalPrice = Number(product.PRECIO_MOSTRADOR) * quantity;
+  const [hasError, setHasError] = useState(false);
+  const imageSrc = hasError ? '/images/luma.jpg' : getProductImageUrl(product.COD_ARTICU);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex items-center gap-3">
@@ -79,12 +83,13 @@ function CartItemCard({ item }: CartItemCardProps) {
       {/* Imagen del producto */}
       <div className="relative w-28 h-28 shrink-0 bg-gray-100">
         <Image
-          src='/images/luma.jpg'
+          src={imageSrc}
           alt={product.DESCRIPCION}
           fill
           className="object-cover rounded"
           sizes="112px"
-          unoptimized
+          unoptimized={imageSrc.startsWith('/images/')}
+          onError={() => setHasError(true)}
         />
       </div>
     </div>
