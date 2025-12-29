@@ -4,45 +4,48 @@ import formatDate from "@/utils/dateUtils";
 
 interface OrderCardProps {
   order: Order;
-  onMarkComplete: () => void;
+  onMarkComplete: () => void | Promise<void>;
   hideCompleteButton?: boolean;
   isUpdating?: boolean;
+  isNew?: boolean;
 }
 
-export default function OrderCard({ order, onMarkComplete, hideCompleteButton = false, isUpdating = false }: OrderCardProps) {
+export default function OrderCard({ order, onMarkComplete, hideCompleteButton = false, isUpdating = false, isNew = false }: OrderCardProps) {
   const isCompleted = order.items.length > 0 && order.items.every((item) => item.status === "delivered");
 
   return (
     <div
-      className={`rounded-lg border p-4 relative ${
-        isCompleted
+      className={`rounded-lg md:rounded-xl border md:border-2 p-4 md:p-6 relative transition-all duration-500 ${
+        isNew
+          ? "bg-yellow-50 border-yellow-400 shadow-lg ring-2 ring-yellow-300"
+          : isCompleted
           ? "bg-gray-50 border-gray-200 opacity-75"
           : "bg-white border-gray-200"
       }`}
     >
       {/* Badge Completado o Botón Marcar completo */}
       {isCompleted ? (
-        <div className="absolute top-4 right-4 bg-white border border-gray-300 rounded-lg px-3 py-1.5 flex items-center gap-1.5">
+        <div className="absolute top-4 right-4 md:top-6 md:right-6 bg-white border md:border-2 border-gray-300 rounded-lg px-3 py-1.5 md:px-5 md:py-3 flex items-center gap-1.5 md:gap-2">
           <svg
             width="16"
             height="16"
+            className="md:w-6 md:h-6 text-gray-400"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-gray-400"
           >
             <path d="M20 6L9 17l-5-5" />
           </svg>
-          <span className="text-sm text-gray-400 font-medium">Completado</span>
+          <span className="text-sm md:text-xl text-gray-400 font-medium">Completado</span>
         </div>
       ) : !hideCompleteButton ? (
         <button
           onClick={onMarkComplete}
           disabled={isUpdating}
-          className={`absolute top-4 right-4 text-sm font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+          className={`absolute top-4 right-4 md:top-6 md:right-6 text-sm md:text-lg font-medium px-4 py-2 md:px-6 md:py-3 rounded-lg transition-colors flex items-center gap-2 md:gap-3 ${
             isUpdating
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-blue-600 text-white hover:bg-blue-700"
@@ -51,7 +54,7 @@ export default function OrderCard({ order, onMarkComplete, hideCompleteButton = 
           {isUpdating ? (
             <>
               <svg
-                className="animate-spin h-4 w-4 text-gray-500"
+                className="animate-spin h-4 w-4 md:h-6 md:w-6 text-gray-500"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -82,7 +85,7 @@ export default function OrderCard({ order, onMarkComplete, hideCompleteButton = 
       <div >
         {order.created_at && (
           <div
-            className={`text-sm mb-1 ${
+            className={`text-sm md:text-xl mb-1 md:mb-2 ${
               isCompleted ? "text-gray-400" : "text-gray-600"
             }`}
           >
@@ -90,21 +93,21 @@ export default function OrderCard({ order, onMarkComplete, hideCompleteButton = 
           </div>
         )}
         <div
-          className={`text-sm mb-1 ${
+          className={`text-sm md:text-xl mb-1 md:mb-2 ${
             isCompleted ? "text-gray-400" : "text-gray-600"
           }`}
         >
           {order.time}
         </div>
         <div
-          className={`text-base font-semibold mb-2 ${
+          className={`text-lg md:text-2xl font-semibold mb-2 md:mb-3 ${
             isCompleted ? "text-gray-500" : "text-gray-900"
           }`}
         >
           Pedido #{order.id}
         </div>
         <div
-          className={`inline-block text-sm font-medium px-3 py-1 rounded-full mb-4 ${
+          className={`inline-block text-sm md:text-xl font-medium px-3 py-1 md:px-5 md:py-2 rounded-full mb-3 md:mb-5 ${
             isCompleted
               ? "bg-gray-200 text-gray-500"
               : "bg-green-100 text-green-800"
@@ -114,20 +117,20 @@ export default function OrderCard({ order, onMarkComplete, hideCompleteButton = 
         </div>
 
         {/* Items del pedido */}
-        <div className="space-y-2">
+        <div className="space-y-2 md:space-y-3">
           {order.items.map((item, index) => (
             <div
               key={index}
-              className="flex justify-between items-center text-sm"
+              className="flex justify-between items-center text-base md:text-xl"
             >
               <span
                 className={isCompleted ? "text-gray-400" : "text-gray-700"}
               >
-                <span className="text-base font-bold">{item.quantity}</span>{" "}
+                <span className="text-lg md:text-2xl font-bold">{item.quantity}</span>{" "}
                 {item.name}
               </span>
               <span
-                className={`font-medium ${
+                className={`font-medium text-base md:text-xl ${
                   isCompleted ? "text-gray-400" : "text-gray-900"
                 }`}
               >

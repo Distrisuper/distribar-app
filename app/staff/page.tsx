@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, useMemo, Suspense } from "react";
+import { useEffect, useState, useMemo, Suspense, useRef, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "../store/authStore";
 import { useOrdersStore, OrderFilter } from "../store/ordersStore";
 import OrderCard from "../components/staff/OrderCard";
+import { Order } from "../types/orders/order";
 
 function StaffPanelContent() {
   const router = useRouter();
@@ -22,6 +23,10 @@ function StaffPanelContent() {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [ordersError, setOrdersError] = useState<string | null>(null);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set());
+  const isRefetchingRef = useRef(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const getFilterFromParams = (): OrderFilter => {
     const status = searchParams.get("status");
@@ -155,6 +160,94 @@ function StaffPanelContent() {
     }
   }, [isAuthenticated, isChecking, router]);
 
+  // Función para obtener pedidos del API
+  const fetchOrdersFromAPI = async (): Promise<Order[]> => {
+    const baseUrl = process.env.NEXT_PUBLIC_LUMA_API;
+    if (!baseUrl) {
+      throw new Error("Falta la variable NEXT_PUBLIC_LUMA_API");
+    }
+    const response = await fetch(`${baseUrl}/v1/orders/`);
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}`);
+    }
+    const data = await response.json();
+    return data.data;
+  };
+
+  // Función para reproducir sonido de notificación
+  const playNotificationSound = useCallback(() => {
+    try {
+      // Crear un contexto de audio si no existe
+      if (typeof window !== "undefined" && typeof AudioContext !== "undefined") {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        // Configurar el sonido (beep agradable)
+        oscillator.frequency.value = 800; // Frecuencia en Hz
+        oscillator.type = "sine";
+
+        const duration = 1.5; // Duración en segundos (1.5 segundos)
+
+        // Configurar el volumen (fade in/out para sonido más suave)
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
+        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + duration - 0.2);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+        // Reproducir el sonido
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + duration);
+      }
+    } catch (error) {
+      // Si falla el audio, no hacer nada (no es crítico)
+      console.error("Error al reproducir sonido:", error);
+    }
+  }, []);
+
+  // Función para agregar solo pedidos nuevos basándose en el ID
+  const fetchNewOrders = useCallback(async () => {
+    if (isRefetchingRef.current) return; // Evitar múltiples refetches simultáneos
+    
+    isRefetchingRef.current = true;
+    try {
+      const newOrders = await fetchOrdersFromAPI();
+      // Obtener el estado actual del store para evitar problemas con dependencias
+      const currentOrders = useOrdersStore.getState().orders;
+      const currentOrderIds = new Set(currentOrders.map((order) => order.id));
+      
+      // Filtrar solo los pedidos que no existen en la lista actual
+      const ordersToAdd = newOrders.filter(
+        (order) => !currentOrderIds.has(order.id)
+      );
+      
+      // Si hay pedidos nuevos, agregarlos a la lista existente
+      if (ordersToAdd.length > 0) {
+        useOrdersStore.getState().setOrders([...currentOrders, ...ordersToAdd]);
+        
+        // Marcar pedidos como nuevos y reproducir sonido
+        const newIds = ordersToAdd.map((order) => order.id);
+        setNewOrderIds((prev) => {
+          const updated = new Set(prev);
+          newIds.forEach((id) => updated.add(id));
+          return updated;
+        });
+        
+        // Reproducir sonido de notificación
+        playNotificationSound();
+      }
+    } catch (error) {
+      // No mostrar error en el refetch automático para no interrumpir la experiencia
+      console.error("Error al refetch de pedidos:", error);
+    } finally {
+      isRefetchingRef.current = false;
+    }
+  }, [playNotificationSound]);
+
+  // Fetch inicial de pedidos
   useEffect(() => {
     const fetchOrders = async () => {
       const baseUrl = process.env.NEXT_PUBLIC_LUMA_API;
@@ -165,12 +258,8 @@ function StaffPanelContent() {
       setLoadingOrders(true);
       setOrdersError(null);
       try {
-        const response = await fetch(`${baseUrl}/v1/orders/`);
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}`);
-        }
-        const data = await response.json();
-        setOrders(data.data);
+        const data = await fetchOrdersFromAPI();
+        setOrders(data);
       } catch (error) {
         setOrdersError(
           error instanceof Error ? error.message : "Error al cargar pedidos"
@@ -182,6 +271,48 @@ function StaffPanelContent() {
 
     fetchOrders();
   }, [setOrders]);
+
+  // Refetch automático cada 30 segundos
+  useEffect(() => {
+    // Solo iniciar el refetch si el usuario está autenticado
+    if (!isAuthenticated || isChecking) {
+      return;
+    }
+
+    // Configurar el intervalo para refetch cada 30 segundos
+    intervalRef.current = setInterval(() => {
+      fetchNewOrders();
+    }, 30000); // 30 segundos
+
+    // Limpiar el intervalo cuando el componente se desmonte o cambien las dependencias
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isAuthenticated, isChecking, fetchNewOrders]);
+
+  // Limpiar el resaltado de pedidos nuevos después de 5 segundos
+  useEffect(() => {
+    if (newOrderIds.size === 0) return;
+
+    const timeoutIds: NodeJS.Timeout[] = [];
+    newOrderIds.forEach((orderId) => {
+      const timeoutId = setTimeout(() => {
+        setNewOrderIds((prev) => {
+          const updated = new Set(prev);
+          updated.delete(orderId);
+          return updated;
+        });
+      }, 5000); // 5 segundos
+      timeoutIds.push(timeoutId);
+    });
+
+    return () => {
+      timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId));
+    };
+  }, [newOrderIds]);
 
   const handleLogout = () => {
     logout();
@@ -228,7 +359,7 @@ function StaffPanelContent() {
   if (isChecking) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Cargando...</div>
+        <div className="text-gray-600 text-lg md:text-2xl">Cargando...</div>
       </div>
     );
   }
@@ -239,61 +370,40 @@ function StaffPanelContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-[600px] mx-auto bg-white min-h-screen">
+      <div className="mx-auto bg-white min-h-screen">
         {/* Header */}
         <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-          <div className="px-4 py-3">
-            {/* Título y botón refrescar */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
+          <div className="px-4 py-3 md:px-6 md:py-5">
+            {/* Título */}
+            <div className="flex items-center mb-4 md:mb-6">
+              <div className="flex items-center gap-2 md:gap-3">
                 <button
                   onClick={handleBack}
-                  className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 -ml-2 md:p-3 md:-ml-3 hover:bg-gray-100 rounded-full transition-colors"
                   aria-label="Volver"
                 >
                   <svg
                     width="24"
                     height="24"
+                    className="md:w-8 md:h-8 text-gray-700"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="text-gray-700"
                   >
                     <path d="m15 18-6-6 6-6" />
                   </svg>
                 </button>
-                <h1 className="text-lg font-semibold text-gray-900">
+                <h1 className="text-lg md:text-3xl font-semibold text-gray-900">
                   Panel de Staff
                 </h1>
               </div>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-2.5 py-1 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-md transition-colors flex items-center gap-1"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-                  <path d="M21 3v5h-5" />
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-                  <path d="M3 21v-5h5" />
-                </svg>
-                Refrescar
-              </button>
             </div>
 
             {/* Filtros */}
-            <div className="flex gap-2 overflow-x-auto hide-scrollbar">
+            <div className="flex gap-2 md:gap-3 overflow-x-auto hide-scrollbar">
               {filters.map((filter) => (
                 <button
                   key={filter.value}
@@ -301,7 +411,7 @@ function StaffPanelContent() {
                     setSelectedFilter(filter.value);
                     updateUrlFromFilter(filter.value);
                   }}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                  className={`px-4 py-2 md:px-6 md:py-3 rounded-full text-sm md:text-xl font-medium whitespace-nowrap transition-colors ${
                     selectedFilter === filter.value
                       ? "bg-blue-600 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -315,13 +425,13 @@ function StaffPanelContent() {
         </header>
 
         {/* Lista de pedidos */}
-        <div className="px-4 py-4">
+        <div className="px-4 py-4 md:px-6 md:py-6">
           {loadingOrders ? (
-            <div className="text-center py-12 text-gray-500">Cargando pedidos...</div>
+            <div className="text-center py-12 md:py-16 text-gray-500 text-lg md:text-2xl">Cargando pedidos...</div>
           ) : ordersError ? (
-            <div className="text-center py-12 text-red-500">Error: {ordersError}</div>
+            <div className="text-center py-12 md:py-16 text-red-500 text-lg md:text-2xl">Error: {ordersError}</div>
           ) : filteredOrders.length > 0 ? (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 md:gap-6">
               {filteredOrders.map((order) => (
                 <OrderCard
                   key={order.id}
@@ -329,12 +439,13 @@ function StaffPanelContent() {
                   onMarkComplete={() => handleMarkComplete(order.id)}
                   hideCompleteButton={selectedFilter === "pending" || selectedFilter === "delivered"}
                   isUpdating={updatingOrderId === order.id}
+                  isNew={newOrderIds.has(order.id)}
                 />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-gray-500">
-              <p>
+            <div className="text-center py-12 md:py-16 text-gray-500">
+              <p className="text-lg md:text-2xl">
                 No hay pedidos{" "}
                 {selectedFilter === "pending"
                   ? "activos"
@@ -359,7 +470,7 @@ export default function StaffPanel() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-gray-600">Cargando...</div>
+          <div className="text-gray-600 text-lg md:text-2xl">Cargando...</div>
         </div>
       }
     >
