@@ -8,7 +8,7 @@ export default function Footer() {
 
   return (
     <footer 
-      className={`w-full py-6 px-4 ${hasItems ? "mb-20 relative z-[60]" : ""}`}
+      className={`w-full py-6 px-4 ${hasItems ? "mb-20 relative z-60" : ""}`}
       style={{ backgroundColor: "#142A3B" }}
     >
       <div className="max-w-[600px] mx-auto">
