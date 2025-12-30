@@ -14,7 +14,7 @@ export default function Header() {
     <header className="w-full " style={{ backgroundColor: "#142A3B" }}>
       <div className="flex flex-col px-4 pt-4 pb-3 max-w-[600px] mx-auto">
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-end gap-2">
             <Image
               src="/images/Logo_luma_arena.png"
               alt="LUMA"
@@ -23,6 +23,17 @@ export default function Header() {
               className="h-8 w-auto"
               priority
             />
+            <p className="text-gray-300 text-xs pb-0">
+              Powered by{" "}
+              <a
+                href="https://www.aokitech.com.ar/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-white hover:text-gray-200 transition-colors underline decoration-transparent hover:decoration-white"
+              >
+                Aoki
+              </a>
+            </p>
             {orderContext && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/20 rounded-full">
                 <span className="text-white text-xs font-medium capitalize">

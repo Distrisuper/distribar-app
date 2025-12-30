@@ -4,7 +4,6 @@ import CategoryFilter from "./CategoryFilter";
 import ProductsList from "./ProductsList";
 import ResumeCart from "./ResumeCart";
 import QRValidator from "./QRValidator";
-import Footer from "./Footer";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUserStore } from "../store/userStore";
@@ -30,7 +29,6 @@ export default function HomeContent() {
         <ProductsList />
       </div>
       <ResumeCart />
-      <Footer />
     </div>
   );
 }
