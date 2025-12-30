@@ -146,6 +146,25 @@ export default function OrderCard({ order, onMarkComplete, hideCompleteButton = 
             </div>
           ))}
         </div>
+
+        {/* Observación */}
+        {order.description && (
+          <div className={`mt-4 md:mt-5 p-3 md:p-4 rounded-lg border-l-4 ${
+            isCompleted 
+              ? "bg-gray-100 border-gray-300" 
+              : "bg-blue-50 border-blue-400"
+          }`}>
+            <div className="flex items-start gap-2 md:gap-3">
+              <div className="flex-1">
+                <p className={`text-sm md:text-base leading-relaxed ${
+                  isCompleted ? "text-gray-400" : "text-gray-800"
+                }`}>
+                  {order.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -19,6 +19,7 @@ export default function CartPage() {
 
   const { orderContext } = useUserStore();
   const [isSending, setIsSending] = useState(false);
+  const [observations, setObservations] = useState("");
 
   const totalPrice = getTotalPrice();
 
@@ -40,6 +41,7 @@ export default function CartPage() {
         location_type: orderContext?.type,
         location_id: orderContext?.id,
         status: 'pending',
+        description: observations.trim() || null,
         products: items.map((item) => ({
           product_id: item.product.COD_ARTICU,
           quantity: item.quantity,
@@ -61,6 +63,7 @@ export default function CartPage() {
         throw new Error('Failed to send order');
       }
       clearCart();
+      setObservations(""); // Limpiar observaciones después de enviar
       
       // Mostrar mensaje de éxito con SweetAlert
       await Swal.fire({
@@ -146,6 +149,19 @@ export default function CartPage() {
         {items.length > 0 && (
           <div className="fixed bottom-0 left-0 right-0 bg-gray-100 border-t border-gray-200">
             <div className="max-w-[600px] mx-auto px-4 py-4">
+              {/* Campo de observaciones */}
+              <div className="mb-4">
+                  <textarea
+                    id="observations"
+                    value={observations}
+                    onChange={(e) => setObservations(e.target.value)}
+                    placeholder="Ingrese una observación para el pedido"
+                    className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-base text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    rows={2}
+                    maxLength={500}
+                  />
+              </div>
+
               {/* Total */}
               <div className="flex justify-between items-center mb-4">
                 <span className="text-base font-medium text-gray-700">Total</span>

@@ -17,5 +17,6 @@ export type Order = {
   created_at?: string;
   items: OrderItem[];
   status: OrderStatus;
+  description?: string | null;
 };
 
