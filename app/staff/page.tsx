@@ -431,7 +431,7 @@ function StaffPanelContent() {
           ) : ordersError ? (
             <div className="text-center py-12 md:py-16 text-red-500 text-lg md:text-2xl">Error: {ordersError}</div>
           ) : filteredOrders.length > 0 ? (
-            <div className="flex flex-col gap-4 md:gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               {filteredOrders.map((order) => (
                 <OrderCard
                   key={order.id}
