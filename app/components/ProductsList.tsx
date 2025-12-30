@@ -50,14 +50,20 @@ export default function ProductsList() {
               .toLowerCase()
               .includes(searchQuery.toLowerCase())
         )
-      : products.filter(
-          (product) =>
-            product.RUBRO === selectedCategory &&
-            (product.DESCRIPCION.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              product.DESCRIPCION_COMANDA
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()))
-        );
+      : products.filter((product) => {
+          const rubroLower = product.RUBRO.toLowerCase();
+          const categoryLower = selectedCategory.toLowerCase();
+          
+          const matchesCategory = 
+            rubroLower.includes(categoryLower) ||
+            (categoryLower.includes("cafeteria") && rubroLower.includes("pasteleria"));
+          
+          const matchesSearch =
+            product.DESCRIPCION.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.DESCRIPCION_COMANDA.toLowerCase().includes(searchQuery.toLowerCase());
+          
+          return matchesCategory && matchesSearch;
+        });
 
 
   return (
