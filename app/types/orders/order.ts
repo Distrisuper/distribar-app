@@ -1,4 +1,4 @@
-export type OrderStatus = "pending" | "delivered";
+export type OrderStatus = "pending" | "delivered" | "prepending";
 export type OrderItemsStatus = "pending" | "delivered";
 
 export type OrderItem = {

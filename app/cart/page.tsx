@@ -40,7 +40,7 @@ export default function CartPage() {
       const dataToSend = {
         location_type: orderContext?.type,
         location_id: orderContext?.id,
-        status: 'pending',
+        status: 'prepending',
         description: observations.trim() || '',
         products: items.map((item) => ({
           product_id: item.product.COD_ARTICU,

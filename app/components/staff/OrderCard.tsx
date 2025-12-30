@@ -26,7 +26,7 @@ export default function OrderCard({ order, onMarkComplete, hideCompleteButton = 
           : "bg-white border-gray-200"
       }`}
     >
-      {/* Badge Completado o Botón Marcar completo */}
+      {/* Badge Completado o Botón Marcar completo o Habilitar */}
       {isCompleted ? (
         <div className="absolute top-4 right-4 md:top-6 md:right-6 bg-white border md:border-2 border-gray-300 rounded-lg px-3 py-1.5 md:px-5 md:py-3 flex items-center gap-1.5 md:gap-2">
           <svg
@@ -44,6 +44,13 @@ export default function OrderCard({ order, onMarkComplete, hideCompleteButton = 
           </svg>
           <span className="text-sm md:text-xl text-gray-400 font-medium">Completado</span>
         </div>
+      ) : selectedFilter === "caja" ? (
+        <button
+          onClick={onMarkComplete}
+          className="absolute top-4 right-4 md:top-6 md:right-6 text-sm md:text-lg font-medium px-4 py-2 md:px-6 md:py-3 rounded-lg transition-colors bg-green-600 text-white hover:bg-green-700"
+        >
+          Habilitar
+        </button>
       ) : !hideCompleteButton ? (
         <button
           onClick={onMarkComplete}

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { Order, OrderStatus } from "../types/orders/order";
 
-export type OrderFilter = OrderStatus | "bar" | "kitchen";
+export type OrderFilter = OrderStatus | "bar" | "kitchen" | "caja";
 
 interface OrdersStore {
   orders: Order[];
@@ -21,12 +21,17 @@ export const useOrdersStore = create<OrdersStore>((set, get) => ({
     set((state) => ({
       orders: state.orders.map((order) =>
         order.id === orderId
-          ? {
-              ...order,
-              items: order.items.map((item) =>
-                item.area === area ? { ...item, status: "delivered" } : item
-              ),
-            }
+          ? area === "caja"
+            ? {
+                ...order,
+                status: "pending",
+              }
+            : {
+                ...order,
+                items: order.items.map((item) =>
+                  item.area === area ? { ...item, status: "delivered" } : item
+                ),
+              }
           : order
       ),
     })),

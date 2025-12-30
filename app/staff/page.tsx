@@ -32,6 +32,7 @@ function StaffPanelContent() {
     const status = searchParams.get("status");
     const area = searchParams.get("area");
     
+    if (status === "prepending") return "caja";
     if (status === "active") return "pending";
     if (status === "completed") return "delivered";
     if (area === "bar") return "bar";
@@ -47,6 +48,8 @@ function StaffPanelContent() {
       params.set("status", "active");
     } else if (filter === "delivered") {
       params.set("status", "completed");
+    } else if (filter === "caja") {
+      params.set("status", "prepending");
     } else if (filter === "bar" || filter === "kitchen") {
       params.set("area", filter);
     }
@@ -61,16 +64,46 @@ function StaffPanelContent() {
       return [];
     }
     
-    if (filter === "pending" || filter === "delivered") {
+    // Filtro para "caja" - pedidos con status "prepending"
+    if (filter === "caja") {
+      return orders.filter((order) => order.status === "prepending");
+    }
+    
+    // Filtro para "pending" (Activo) - solo items pending en pedidos pending
+    if (filter === "pending") {
+      const filtered = orders
+        .filter((order) => {
+          // Solo pedidos con status pending
+          if (order.status !== "pending") return false;
+          // Verificar que el order tenga items
+          if (!order.items || order.items.length === 0) return false;
+          // Solo pedidos que tengan items con status pending
+          return order.items.some((item) => item?.status === "pending");
+        })
+        .map((order) => {
+          // Filtrar solo items con status pending
+          const filteredItems = order.items.filter((item) => item?.status === "pending");
+          return {
+            ...order,
+            items: filteredItems,
+          };
+        })
+        .filter((order) => order.items.length > 0);
+      
+      return filtered;
+    }
+    
+    // Filtro para "delivered" (Completado)
+    if (filter === "delivered") {
       const filtered = orders
         .filter((order) => {
           // Verificar que el order tenga items
           if (!order.items || order.items.length === 0) return false;
           // Si los items no tienen status, usar el status del pedido como fallback
-          const hasItemsWithStatus = order.items.some((item) => item?.status === filter);
+          const hasItemsWithStatus = order.items.some((item) => item?.status === "delivered");
           // Si ningún item tiene status, usar el status del pedido
           const hasNoItemStatus = !order.items.some((item) => item?.status);
-          if (hasNoItemStatus && order.status === filter) {
+          if (hasNoItemStatus && order.status === "delivered") {
             return true;
           }
           return hasItemsWithStatus;
@@ -79,10 +112,10 @@ function StaffPanelContent() {
           const filteredItems = order.items.filter((item) => {
             // Si el item tiene status, filtrar por status
             if (item?.status) {
-              return item.status === filter;
+              return item.status === "delivered";
             }
             // Si no tiene status, usar el status del pedido
-            return order.status === filter;
+            return order.status === "delivered";
           });
           return {
             ...order,
@@ -91,23 +124,19 @@ function StaffPanelContent() {
         })
         .filter((order) => order.items.length > 0);
 
-      if (filter === "delivered") {
-        return filtered.sort((a, b) => {
-          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-          
-          if (dateA && dateB) {
-            return dateB - dateA;
-          }
-          
-          if (dateA && !dateB) return -1;
-          if (!dateA && dateB) return 1;
-          
-          return parseInt(b.id) - parseInt(a.id);
-        });
-      }
-
-      return filtered;
+      return filtered.sort((a, b) => {
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        
+        if (dateA && dateB) {
+          return dateB - dateA;
+        }
+        
+        if (dateA && !dateB) return -1;
+        if (!dateA && dateB) return 1;
+        
+        return parseInt(b.id) - parseInt(a.id);
+      });
     }
     
     if (filter === "bar" || filter === "kitchen") {
@@ -324,6 +353,7 @@ function StaffPanelContent() {
   };
 
   const filters: { label: string; value: OrderFilter }[] = [
+    { label: "Caja", value: "caja" },
     { label: "Activo", value: "pending" },
     { label: "Bar", value: "bar" },
     { label: "Cocina", value: "kitchen" },
@@ -341,7 +371,7 @@ function StaffPanelContent() {
       const response = await fetch(`${baseUrl}/v1/orders/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "delivered", area: selectedFilter }),
+        body: JSON.stringify({ status: "delivered", area: selectedFilter === "caja" ? "bar" : selectedFilter }),
       });
       if (!response.ok) {
         throw new Error(`Error ${response.status}`);
@@ -437,7 +467,7 @@ function StaffPanelContent() {
                   key={order.id}
                   order={order}
                   onMarkComplete={() => handleMarkComplete(order.id)}
-                  hideCompleteButton={selectedFilter === "pending" || selectedFilter === "delivered"}
+                  hideCompleteButton={selectedFilter === "pending" || selectedFilter === "delivered" || selectedFilter === "caja"}
                   isUpdating={updatingOrderId === order.id}
                   isNew={newOrderIds.has(order.id)}
                   selectedFilter={selectedFilter}
@@ -452,6 +482,8 @@ function StaffPanelContent() {
                   ? "activos"
                   : selectedFilter === "delivered"
                   ? "completados"
+                  : selectedFilter === "caja"
+                  ? "en caja"
                   : selectedFilter === "bar"
                   ? "de bar"
                   : selectedFilter === "kitchen"
