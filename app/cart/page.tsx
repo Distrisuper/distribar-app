@@ -41,7 +41,7 @@ export default function CartPage() {
         location_type: orderContext?.type,
         location_id: orderContext?.id,
         status: 'pending',
-        description: observations.trim() || null,
+        description: observations.trim() || '',
         products: items.map((item) => ({
           product_id: item.product.COD_ARTICU,
           quantity: item.quantity,
