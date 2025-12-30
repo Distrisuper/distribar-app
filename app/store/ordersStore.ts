@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { Order, OrderStatus } from "../types/orders/order";
 
-export type OrderFilter = OrderStatus | "bar" | "kitchen";
+export type OrderFilter = OrderStatus | "bar" | "kitchen" | "caja";
 
 interface OrdersStore {
   orders: Order[];
@@ -33,6 +33,10 @@ export const useOrdersStore = create<OrdersStore>((set, get) => ({
   getFilteredOrders: () => {
     const state = get();
     const { selectedFilter, orders } = state;
+    
+    if (selectedFilter === "caja") {
+      return orders;
+    }
     
     if (selectedFilter === "pending" || selectedFilter === "delivered") {
       return orders.filter((order) => order.status === selectedFilter);

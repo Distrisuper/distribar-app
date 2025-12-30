@@ -34,6 +34,7 @@ function StaffPanelContent() {
     
     if (status === "active") return "pending";
     if (status === "completed") return "delivered";
+    if (area === "caja") return "caja";
     if (area === "bar") return "bar";
     if (area === "kitchen") return "kitchen";
     
@@ -47,7 +48,7 @@ function StaffPanelContent() {
       params.set("status", "active");
     } else if (filter === "delivered") {
       params.set("status", "completed");
-    } else if (filter === "bar" || filter === "kitchen") {
+    } else if (filter === "caja" || filter === "bar" || filter === "kitchen") {
       params.set("area", filter);
     }
     
@@ -59,6 +60,11 @@ function StaffPanelContent() {
     
     if (!orders || orders.length === 0) {
       return [];
+    }
+    
+    // Filtro para "caja" - muestra todos los pedidos sin importar su estado
+    if (filter === "caja") {
+      return orders;
     }
     
     if (filter === "pending" || filter === "delivered") {
@@ -324,6 +330,7 @@ function StaffPanelContent() {
   };
 
   const filters: { label: string; value: OrderFilter }[] = [
+    { label: "Caja", value: "caja" },
     { label: "Activo", value: "pending" },
     { label: "Bar", value: "bar" },
     { label: "Cocina", value: "kitchen" },
@@ -437,7 +444,7 @@ function StaffPanelContent() {
                   key={order.id}
                   order={order}
                   onMarkComplete={() => handleMarkComplete(order.id)}
-                  hideCompleteButton={selectedFilter === "pending" || selectedFilter === "delivered"}
+                  hideCompleteButton={selectedFilter === "pending" || selectedFilter === "delivered" || selectedFilter === "caja"}
                   isUpdating={updatingOrderId === order.id}
                   isNew={newOrderIds.has(order.id)}
                   selectedFilter={selectedFilter}
@@ -452,6 +459,8 @@ function StaffPanelContent() {
                   ? "activos"
                   : selectedFilter === "delivered"
                   ? "completados"
+                  : selectedFilter === "caja"
+                  ? "en caja"
                   : selectedFilter === "bar"
                   ? "de bar"
                   : selectedFilter === "kitchen"
