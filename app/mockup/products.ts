@@ -526,7 +526,21 @@ export const mockupProducts = [
     "PRECIO_SALON": "16000",
     "REGLA_ACTIVIDAD": null,
     "RUBRO": "COMIDA",
-    "TIEMPO": "0000-01-01T00:00:00-03:00"
+    "TIEMPO": "0000-01-01T00:00:00-03:00",
+    "OPCIONES": [
+      {
+        "name_option": "con jamon",
+        "default_value": true,
+      },
+      {
+        "name_option": "con queso",
+        "default_value": true,
+      },
+      {
+        "name_option": "con tomate",
+        "default_value": true,
+      }
+    ]
   },
   {
     "ACEPTADECIMALES": "N",
