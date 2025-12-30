@@ -1,6 +1,7 @@
 import { Order } from "@/types/orders/order";
 import { formatPrice } from "@/utils/priceUtils";
 import formatDate from "@/utils/dateUtils";
+import { OrderFilter } from "../../store/ordersStore";
 
 interface OrderCardProps {
   order: Order;
@@ -8,10 +9,12 @@ interface OrderCardProps {
   hideCompleteButton?: boolean;
   isUpdating?: boolean;
   isNew?: boolean;
+  selectedFilter?: OrderFilter;
 }
 
-export default function OrderCard({ order, onMarkComplete, hideCompleteButton = false, isUpdating = false, isNew = false }: OrderCardProps) {
+export default function OrderCard({ order, onMarkComplete, hideCompleteButton = false, isUpdating = false, isNew = false, selectedFilter }: OrderCardProps) {
   const isCompleted = order.items.length > 0 && order.items.every((item) => item.status === "delivered");
+  const shouldHidePrices = selectedFilter === "delivered" || selectedFilter === "bar" || selectedFilter === "kitchen";
 
   return (
     <div
@@ -121,7 +124,9 @@ export default function OrderCard({ order, onMarkComplete, hideCompleteButton = 
           {order.items.map((item, index) => (
             <div
               key={index}
-              className="flex justify-between items-center text-base md:text-xl"
+              className={`flex items-center text-base md:text-xl ${
+                shouldHidePrices ? "justify-start" : "justify-between"
+              }`}
             >
               <span
                 className={isCompleted ? "text-gray-400" : "text-gray-700"}
@@ -129,13 +134,15 @@ export default function OrderCard({ order, onMarkComplete, hideCompleteButton = 
                 <span className="text-lg md:text-2xl font-bold">{item.quantity}</span>{" "}
                 {item.name}
               </span>
-              <span
-                className={`font-medium text-base md:text-xl ${
-                  isCompleted ? "text-gray-400" : "text-gray-900"
-                }`}
-              >
-                $ {formatPrice(item.price)}
-              </span>
+              {!shouldHidePrices && (
+                <span
+                  className={`font-medium text-base md:text-xl ${
+                    isCompleted ? "text-gray-400" : "text-gray-900"
+                  }`}
+                >
+                  $ {formatPrice(item.price)}
+                </span>
+              )}
             </div>
           ))}
         </div>

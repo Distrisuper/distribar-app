@@ -440,6 +440,7 @@ function StaffPanelContent() {
                   hideCompleteButton={selectedFilter === "pending" || selectedFilter === "delivered"}
                   isUpdating={updatingOrderId === order.id}
                   isNew={newOrderIds.has(order.id)}
+                  selectedFilter={selectedFilter}
                 />
               ))}
             </div>

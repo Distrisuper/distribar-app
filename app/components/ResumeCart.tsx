@@ -17,7 +17,7 @@ export default function ResumeCart() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white pt-2">
+    <div className="fixed bottom-0 left-0 right-0 z-150 bg-white pt-2">
       <div className="flex justify-center">
         <div className="w-full max-w-[600px] px-4 pb-4">
           <div className="bg-gray-200 rounded-lg px-4 py-3 flex items-center gap-3">
