@@ -23,13 +23,13 @@ export default function Header() {
               className="h-8 w-auto"
               priority
             />
-            <p className="text-gray-300 text-xs pb-0">
+            <p className="text-gray-300 text-[10px] pb-0">
               Powered by{" "}
               <a
                 href="https://www.aokitech.com.ar/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-bold text-white hover:text-gray-200 transition-colors underline decoration-transparent hover:decoration-white"
+                className="font-bold text-white hover:text-gray-200 transition-colors underline decoration-transparent hover:decoration-white text-sm"
               >
                 Aoki
               </a>

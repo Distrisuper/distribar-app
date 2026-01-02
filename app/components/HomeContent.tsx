@@ -24,7 +24,9 @@ export default function HomeContent() {
     // No borrar el contexto si no hay params, para preservar la información del usuario
   }, [params, setOrderContext]);
 
-  useEffect(() => {
+  {
+    /**
+     *   useEffect(() => {
     sseClient.connect();
     
     const handleProductsUpdate = (articleCode: string, stock: number) => {
@@ -40,6 +42,8 @@ export default function HomeContent() {
     };
     
   }, [updateProductStock]);
+     */
+  }
 
   return (
     <div className="mx-auto relative bg-white flex flex-col min-h-screen max-w-[600px] md:max-w-[1200px]">

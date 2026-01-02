@@ -71,7 +71,7 @@ export default function ProductCard({
       {sinStock && !isAuthenticated && (
         <div className="absolute bottom-2 right-2 z-30">
           <div className="bg-gray-700 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md">
-            Sin Stock
+            No disponible
           </div>
         </div>
       )}
